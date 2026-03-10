@@ -62,7 +62,7 @@ export function Dashboard() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
-  const seedCategories = async () => {
+  const seedCategories = useCallback(async () => {
     const existingCats = await db.categories.count();
     if (existingCats === 0) {
       const defaultCategories = [
@@ -76,7 +76,7 @@ export function Dashboard() {
       ];
       await db.categories.bulkAdd(defaultCategories);
     }
-  };
+  }, []);
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return;
@@ -130,14 +130,16 @@ export function Dashboard() {
         }
       }
 
-      const byCategory = Array.from(byCategoryMap.values()).map((item) => ({
-        categoryId: item.category.id!,
+      const byCategory = Array.from(byCategoryMap.entries()).map(
+        ([categoryId, item]) => ({
+        categoryId,
         categoryName: item.category.name,
         icon: item.category.icon,
         color: item.category.color,
         total: item.total,
         count: item.count,
-      }));
+      }),
+      );
 
       setSummary({ total, byCategory });
     } catch (error) {
@@ -145,7 +147,7 @@ export function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, month, year]);
+  }, [month, seedCategories, user?.id, year]);
 
   useEffect(() => {
     fetchData();
@@ -215,7 +217,7 @@ export function Dashboard() {
                 Expense Journal
               </h1>
               <p className="text-xs text-muted-foreground">
-                Track your spending
+                Mobile-first expense journal
               </p>
             </div>
           </div>
@@ -278,7 +280,7 @@ export function Dashboard() {
             </SelectTrigger>
             <SelectContent>
               {monthNames.map((name, i) => (
-                <SelectItem key={i + 1} value={(i + 1).toString()}>
+                <SelectItem key={name} value={(i + 1).toString()}>
                   {name}
                 </SelectItem>
               ))}

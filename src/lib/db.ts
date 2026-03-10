@@ -16,7 +16,7 @@ export interface Expense {
   amount: number;
   description?: string;
   date: Date;
-  categoryId: string;
+  categoryId: number;
   receiptUrl?: string;
   createdAt: Date;
   updatedAt: Date;

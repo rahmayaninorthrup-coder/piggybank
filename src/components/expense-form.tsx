@@ -26,7 +26,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface Category {
@@ -68,6 +68,9 @@ export function ExpenseForm({
   );
   const [date, setDate] = useState<Date>(
     editExpense?.date ? new Date(editExpense.date) : new Date(),
+  );
+  const selectableCategories = categories.filter(
+    (category): category is Category & { id: number } => category.id !== undefined,
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -169,8 +172,8 @@ export function ExpenseForm({
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id!.toString()}>
+                {selectableCategories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()}>
                     <span className="flex items-center gap-2">
                       <span>{cat.icon}</span>
                       <span>{cat.name}</span>

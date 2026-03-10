@@ -1,7 +1,7 @@
 "use client";
 
-import { authenticateUser, createUser, hashPassword } from "@/lib/auth";
-import { type User as DBUser, db } from "@/lib/db";
+import { authenticateUser, createUser } from "@/lib/auth";
+import { db } from "@/lib/db";
 import {
   type ReactNode,
   createContext,
@@ -51,7 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setUser(parsed);
+        setUser({
+          ...parsed,
+          createdAt: new Date(parsed.createdAt),
+        });
       } catch {
         localStorage.removeItem(SESSION_KEY);
       }

@@ -145,89 +145,98 @@ export function ExpenseList({
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  {dayExpenses.map((expense) => (
-                    <Card
-                      key={expense.id}
-                      data-design-id={`expense-item-${expense.id}`}
-                      className="p-4 hover:shadow-md transition-shadow group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                          style={{
-                            backgroundColor: `${expense.category?.color}20`,
-                          }}
-                        >
-                          {expense.category?.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">
+                  {dayExpenses.map((expense) => {
+                    if (expense.id === undefined) {
+                      return null;
+                    }
+
+                    const expenseId = expense.id;
+                    const receiptUrl = expense.receiptUrl;
+
+                    return (
+                      <Card
+                        key={expenseId}
+                        data-design-id={`expense-item-${expenseId}`}
+                        className="p-4 hover:shadow-md transition-shadow group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+                            style={{
+                              backgroundColor: `${expense.category?.color}20`,
+                            }}
+                          >
+                            {expense.category?.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">
                               {expense.category?.name}
-                            </span>
-                            {expense.receiptUrl && (
-                              <button
-                                onClick={() =>
-                                  setViewingReceipt(expense.receiptUrl)
-                                }
-                                className="text-xs text-primary hover:underline"
-                              >
-                                📷 View
-                              </button>
+                              </span>
+                              {receiptUrl && (
+                                <button
+                                  onClick={() =>
+                                    setViewingReceipt(receiptUrl ?? null)
+                                  }
+                                  className="text-xs text-primary hover:underline"
+                                >
+                                  📷 View
+                                </button>
+                              )}
+                            </div>
+                            {expense.description && (
+                              <p className="text-sm text-muted-foreground truncate">
+                                {expense.description}
+                              </p>
                             )}
                           </div>
-                          {expense.description && (
-                            <p className="text-sm text-muted-foreground truncate">
-                              {expense.description}
-                            </p>
-                          )}
+                          <div className="text-right flex items-center gap-2">
+                            <span className="font-semibold text-lg font-mono">
+                              {formatAmount(expense.amount)}
+                            </span>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                                >
+                                  ⋮
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <ExpenseForm
+                                  categories={categories}
+                                  onSuccess={onRefresh}
+                                  editExpense={{
+                                    id: expenseId,
+                                    amount: expense.amount,
+                                    description: expense.description,
+                                    categoryId: expense.categoryId,
+                                    date: expense.date,
+                                    receiptUrl,
+                                  }}
+                                  trigger={
+                                    <DropdownMenuItem
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      ✏️ Edit
+                                    </DropdownMenuItem>
+                                  }
+                                />
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => handleDelete(expenseId)}
+                                >
+                                  🗑️ Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
-                        <div className="text-right flex items-center gap-2">
-                          <span className="font-semibold text-lg font-mono">
-                            {formatAmount(expense.amount)}
-                          </span>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                              >
-                                ⋮
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <ExpenseForm
-                                categories={categories}
-                                onSuccess={onRefresh}
-                                editExpense={{
-                                  id: expense.id!,
-                                  amount: expense.amount,
-                                  description: expense.description,
-                                  categoryId: expense.categoryId,
-                                  date: expense.date,
-                                  receiptUrl: expense.receiptUrl,
-                                }}
-                                trigger={
-                                  <DropdownMenuItem
-                                    onSelect={(e) => e.preventDefault()}
-                                  >
-                                    ✏️ Edit
-                                  </DropdownMenuItem>
-                                }
-                              />
-                              <DropdownMenuItem
-                                className="text-destructive focus:text-destructive"
-                                onClick={() => handleDelete(expense.id!)}
-                              >
-                                🗑️ Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             );
